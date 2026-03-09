@@ -83,3 +83,35 @@ def card_delete(request, pk):
         card.delete()
         return redirect('deck_detail', pk=deck_id)
     return render(request, 'flashcards/card_confirm_delete.html', {'card': card})
+
+# перелистывание карточек
+def study_pure(request, deck_id):
+
+    deck = get_object_or_404(Deck, pk=deck_id)
+    cards = list(deck.cards.all())  # все карточки колоды в виде списка
+    
+    
+    try:
+        current_index = int(request.GET.get('index', 0))
+    except ValueError:
+        current_index = 0
+    
+    if current_index < 0:
+        current_index = 0
+    if cards and current_index >= len(cards):
+        current_index = len(cards) - 1
+    
+    show_definition = request.GET.get('show', 'false') == 'true'
+    
+    
+    current_card = cards[current_index] if cards else None
+    
+    context = {
+        'deck': deck,
+        'cards': cards,
+        'current_index': current_index,
+        'current_card': current_card,
+        'show_definition': show_definition,
+        'total': len(cards),
+    }
+    return render(request, 'flashcards/study_pure.html', context)
