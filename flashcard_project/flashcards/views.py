@@ -9,3 +9,9 @@ from .forms import DeckForm, CardForm
 def deck_list(request):
     decks = Deck.objects.all().order_by('-created_at')  # сортировка: новые сверху
     return render(request, 'flashcards/deck_list.html', {'decks': decks})
+
+#Просмотр колоды
+def deck_detail(request, pk):
+    deck = get_object_or_404(Deck, pk=pk)
+    cards = deck.cards.all()  
+    return render(request, 'flashcards/deck_detail.html', {'deck': deck, 'cards': cards})
