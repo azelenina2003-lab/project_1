@@ -1,0 +1,14 @@
+{% extends 'flashcards/base.html' %}
+
+{% block content %}
+<div class="alert alert-danger">
+    <h4>Вы уверены, что хотите удалить колоду "{{ deck.name }}"?</h4>
+    <p>Все карточки в этой колоде также будут удалены.</p>
+</div>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Да, удалить</button>
+    <a href="{% url 'deck_detail' deck.pk %}" class="btn btn-secondary">Отмена</a>
+</form>
+{% endblock %}
