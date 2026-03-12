@@ -91,6 +91,6 @@ def test_study_view(client):
     assert response.status_code == 200
     assert response.context['category'] == category
     assert len(response.context['entries']) == 3
-    # Проверим, что передан правильный индекс (по умолчанию 0)
+    # Проверит, что передан правильный индекс (по умолчанию 0)
     assert response.context['current_index'] == 0
     assert response.context['current_entry'] == entries[0]
