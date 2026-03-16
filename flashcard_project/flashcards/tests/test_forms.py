@@ -1,6 +1,6 @@
 import pytest
 from flashcards.forms import CategoryForm, EntryForm
-from .factories import CategoryFactory
+from .factories import CategoryFactory, UserFactory
 
 @pytest.mark.django_db
 def test_category_form_valid():
@@ -16,7 +16,8 @@ def test_category_form_empty_name():
 
 @pytest.mark.django_db
 def test_entry_form_valid():
-    category = CategoryFactory()
+    user = UserFactory()
+    category = CategoryFactory(user=user)
     form_data = {'term': 'Слово', 'definition': 'Определение'}
     form = EntryForm(data=form_data)
     assert form.is_valid()

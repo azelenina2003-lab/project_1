@@ -4,8 +4,7 @@ from .factories import CategoryFactory, EntryFactory, UserFactory
 
 @pytest.mark.django_db
 def test_test_mode_view_requires_login(client):
-    """Неавторизованный пользователь перенаправляется на логин."""
-    category = CategoryFactory()
+    category = CategoryFactory()  # теперь создаётся с пользователем, но это не важно для этого теста
     url = reverse('test_mode', args=[category.pk])
     response = client.get(url)
     assert response.status_code == 302
@@ -13,7 +12,6 @@ def test_test_mode_view_requires_login(client):
 
 @pytest.mark.django_db
 def test_test_mode_view_shows_term(client):
-    """Авторизованный пользователь видит страницу тестирования с первым термином."""
     user = UserFactory()
     client.force_login(user)
     category = CategoryFactory(user=user)
@@ -24,11 +22,10 @@ def test_test_mode_view_shows_term(client):
     assert response.context['current_entry'] == entry
     content = response.content.decode()
     assert 'Apple' in content
-    assert 'Яблоко' not in content  # определение не показывается изначально
+    assert 'Яблоко' not in content
 
 @pytest.mark.django_db
 def test_test_mode_post_correct_answer(client):
-    """Отправка правильного ответа увеличивает correct_count."""
     user = UserFactory()
     client.force_login(user)
     category = CategoryFactory(user=user)
@@ -44,7 +41,6 @@ def test_test_mode_post_correct_answer(client):
 
 @pytest.mark.django_db
 def test_test_mode_post_wrong_answer(client):
-    """Отправка неправильного ответа увеличивает wrong_count и показывает правильный ответ."""
     user = UserFactory()
     client.force_login(user)
     category = CategoryFactory(user=user)
@@ -58,11 +54,10 @@ def test_test_mode_post_wrong_answer(client):
     assert entry.wrong_count == 1
     assert response.context['result'] is False
     content = response.content.decode()
-    assert 'Яблоко' in content  # правильный ответ должен отображаться
+    assert 'Яблоко' in content
 
 @pytest.mark.django_db
 def test_test_mode_navigation(client):
-    """Проверка переключения между терминами через параметр index."""
     user = UserFactory()
     client.force_login(user)
     category = CategoryFactory(user=user)
@@ -76,7 +71,6 @@ def test_test_mode_navigation(client):
 
 @pytest.mark.django_db
 def test_test_mode_no_entries(client):
-    """Если в категории нет записей, отображается сообщение."""
     user = UserFactory()
     client.force_login(user)
     category = CategoryFactory(user=user)
