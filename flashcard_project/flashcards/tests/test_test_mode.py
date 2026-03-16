@@ -4,7 +4,7 @@ from .factories import CategoryFactory, EntryFactory, UserFactory
 
 @pytest.mark.django_db
 def test_test_mode_view_requires_login(client):
-    """Неавторизованный пользователь перенаправляется на указание логина."""
+    """Неавторизованный пользователь перенаправляется на логин."""
     category = CategoryFactory()
     url = reverse('test_mode', args=[category.pk])
     response = client.get(url)
@@ -22,8 +22,9 @@ def test_test_mode_view_shows_term(client):
     response = client.get(url)
     assert response.status_code == 200
     assert response.context['current_entry'] == entry
-    assert b'Apple' in response.content
-    assert b'Яблоко' not in response.content  # определение не показывается изначально
+    content = response.content.decode()
+    assert 'Apple' in content
+    assert 'Яблоко' not in content  # определение не показывается изначально
 
 @pytest.mark.django_db
 def test_test_mode_post_correct_answer(client):
@@ -36,11 +37,9 @@ def test_test_mode_post_correct_answer(client):
     data = {'answer': 'Яблоко'}
     response = client.post(url, data)
     assert response.status_code == 200
-    # Обновляем объект 
     entry.refresh_from_db()
     assert entry.correct_count == 1
     assert entry.wrong_count == 0
-    # Проверка, что в контексте result=True
     assert response.context['result'] is True
 
 @pytest.mark.django_db
@@ -58,8 +57,8 @@ def test_test_mode_post_wrong_answer(client):
     assert entry.correct_count == 0
     assert entry.wrong_count == 1
     assert response.context['result'] is False
-    # Проверка, что правильный ответ отображается
-    assert b'Яблоко' in response.content
+    content = response.content.decode()
+    assert 'Яблоко' in content  # правильный ответ должен отображаться
 
 @pytest.mark.django_db
 def test_test_mode_navigation(client):
@@ -70,7 +69,6 @@ def test_test_mode_navigation(client):
     entry1 = EntryFactory(category=category, term='Apple')
     entry2 = EntryFactory(category=category, term='Banana')
     url = reverse('test_mode', args=[category.pk])
-    # Переход ко второму термину
     response = client.get(url, {'index': 1})
     assert response.status_code == 200
     assert response.context['current_index'] == 1
@@ -85,4 +83,5 @@ def test_test_mode_no_entries(client):
     url = reverse('test_mode', args=[category.pk])
     response = client.get(url)
     assert response.status_code == 200
-    assert b'нет записей' in response.content.lower()
+    content = response.content.decode().lower()
+    assert 'нет записей' in content
