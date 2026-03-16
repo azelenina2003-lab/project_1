@@ -136,6 +136,53 @@ def study(request, category_id):
         'total': len(entries),
     }
     return render(request, 'flashcards/study.html', context)
+@login_required
+def test_mode(request, category_id):
+    """
+    Режим тестирования: пользователь указывает определение для высветившегося 
+    термина. После того, как форма отправляется,
+    высвечивается результат, статистика обновляется.
+    """
+    category = get_object_or_404(Category, pk=category_id, user=request.user)
+    entries = list(category.entries.all())
+
+    try:
+        current_index = int(request.GET.get('index', 0))
+    except ValueError:
+        current_index = 0
+
+    if current_index < 0:
+        current_index = 0
+    if entries and current_index >= len(entries):
+        current_index = len(entries) - 1
+
+    current_entry = entries[current_index] if entries else None
+    result = None
+    user_answer = ''
+
+    if request.method == 'POST':
+        user_answer = request.POST.get('answer', '').strip()
+        if current_entry:
+            # Сравнение без учёта регистра и лишних пробелов
+            correct = user_answer.lower() == current_entry.definition.strip().lower()
+            if correct:
+                current_entry.correct_count += 1
+                result = True
+            else:
+                current_entry.wrong_count += 1
+                result = False
+            current_entry.save()
+
+    context = {
+        'category': category,
+        'entries': entries,
+        'current_index': current_index,
+        'current_entry': current_entry,
+        'total': len(entries),
+        'result': result,
+        'user_answer': user_answer,
+    }
+    return render(request, 'flashcards/test_mode.html', context)
 
 # Аутентификация пользователя
 
