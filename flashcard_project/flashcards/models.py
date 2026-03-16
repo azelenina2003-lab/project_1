@@ -37,6 +37,9 @@ class Entry(models.Model):
     term = models.CharField('Термин', max_length=200)
     definition = models.TextField('Определение')
     created_at = models.DateTimeField('Дата создания', auto_now_add=True)
+# поля для статистики тестирования
+    correct_count = models.IntegerField('Правильных ответов', default=0)
+    wrong_count = models.IntegerField('Неправильных ответов', default=0)
 
     def __str__(self):
         return self.term  # или f'{self.term} - {self.category.name}'
