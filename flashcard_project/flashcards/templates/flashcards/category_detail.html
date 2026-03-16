@@ -9,8 +9,8 @@
     <a href="{% url 'test_mode' category.pk %}" class="btn btn-info">✍️ Тест</a> 
     <a href="{% url 'category_update' category.pk %}" class="btn btn-warning">✏️ Редактировать</a>
     <a href="{% url 'category_delete' category.pk %}" class="btn btn-danger">🗑️ Удалить</a>
+    </div>
 </div>
-
 <p>{{ category.description }}</p>
 
 <hr>
